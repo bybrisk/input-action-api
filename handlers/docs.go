@@ -1,6 +1,6 @@
-// Package classification of Input-Convo-Starter API
+// Package classification of Input-Action API
 //
-// Documentation for Input-Convo-Starter API
+// Documentation for Input-Action API
 //
 //	Schemes: http
 //	BasePath: /
@@ -15,7 +15,7 @@
 // swagger:meta
 
 package handlers
-import "github.com/bybrisk/input-convo-starter-api/data"
+import "github.com/bybrisk/input-action-api/data"
 
 //
 // NOTE: Types defined here are purely for documentation purposes
@@ -42,34 +42,18 @@ type errorValidationWrapper struct {
 type noContentResponseWrapper struct {
 }
 
-// Message on fetching intial conversation for a business
-// swagger:response intialConversationResponse
-type intialConvoPostResponseWrapper struct {
-	// response on getting intial conversation for a business
+// Response for the order API
+// swagger:response orderAPIResponse
+type orderAPIResponseWrapper struct {
+	// response for Order API
 	// in: body
-	Body data.InitialConversationResponse
+	Body data.OrderAPIResponse
 }
 
-// swagger:parameters startAConversation
-type startConvoParmsWrapper struct {
-	// Data structure to get intial conversation of any business
+// swagger:parameters order
+type requestOrderParmsWrapper struct {
+	// Data structure for the payload of the Order API
 	// in: body
 	// required: true
-	Body data.InitialConversationRequest
-}
-
-// swagger:parameters getActionHandlers
-type getActionHandlerParmsWrapper struct {
-	// Data structure to get questions for a specific action handler
-	// in: body
-	// required: true
-	Body data.ActionHandlerRequest
-}
-
-// Response of the questions for a specific action handler
-// swagger:response actionHandlersResponse
-type actionHandlerResponseWrapper struct {
-	// response on getting questions for an action handler
-	// in: body
-	Body data.ActionHandlerResponse
+	Body data.OrderAPIRequest
 }

@@ -9,25 +9,6 @@ import (
 	//"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func GetInitialConversationMongo(businessId string) (*InitialConversationResponse,error){
-	collectionName := shashankMongo.DatabaseName.Collection("bot-schema")
-	filter := bson.M{"businessid": businessId}
-
-	type InitialConversationResponseWrapper struct{
-		Initialise InitialConversationResponse `json:"initialise"`
-	}
-
-	var document InitialConversationResponseWrapper
-
-	err:= collectionName.FindOne(shashankMongo.CtxForDB, filter).Decode(&document)
-	if err != nil {
-		log.Error("GetInitialConversationMongo ERROR:")
-		log.Error(err)
-	}
-
-	return &document.Initialise,err
-}
-
 func IsUserRegistered(docID string) (bool,error) {
 	var isRegistered bool
 
@@ -57,36 +38,54 @@ func IsUserRegistered(docID string) (bool,error) {
 
 }
 
-func GetQuestionForActionHandlerMongo (d *ActionHandlerRequest) (*QuestionAndTypeStruct,error) {
+func GetActionResponseMongo (d *OrderAPIRequest) (string,error) {
 	collectionName := shashankMongo.DatabaseName.Collection("bot-schema")
 	filter := bson.M{"businessid": d.BusinessID}
 
-	var resp QuestionAndTypeStruct
 	var err error
 
-	//ActionHandler specific struct
-	if (d.ActionHandler == "order") {
-		//change Order to other action handlers
-		type HandlerResponseWrapper struct{
-			Order QuestionAndTypeStruct `json:"order"`
-		}
-		type ActionResponseWrapper struct{
-			Action HandlerResponseWrapper `json:"action"`
-		}
+	type OrderResultStruct struct{
+		Message string `json:"message"`
+	}
+	type HandlerResponseWrapper struct{
+		Order OrderResultStruct `json:"order"`
+	}
+	type ResponseResponseWrapper struct{
+		Response HandlerResponseWrapper `json:"response"`
+	}
 	
-		var document ActionResponseWrapper
+	var document ResponseResponseWrapper
 
-		err = collectionName.FindOne(shashankMongo.CtxForDB, filter).Decode(&document)
-		if err != nil {
-			log.Error("GetQuestionForActionHandlerMongo ERROR:")
-			log.Error(err)
-		}
-
-		resp = QuestionAndTypeStruct{
-			Questions: document.Action.Order.Questions ,
-			QType: document.Action.Order.QType ,
-		}
+	err = collectionName.FindOne(shashankMongo.CtxForDB, filter).Decode(&document)
+	if err != nil {
+		log.Error("GetActionResponseMongo ERROR:")
+		log.Error(err)
 	}
 
-	return &resp,err
+	return document.Response.Order.Message,err
+}
+
+func SaveDeliveryIDToMongo(d *OrderAPIRequest, deliveryID string) int64 {
+	collectionName := shashankMongo.DatabaseName.Collection("input-user")
+	id, _ := primitive.ObjectIDFromHex(d.UserID)
+	filter := bson.M{"_id": id}
+
+	type InputReferenceObject struct {
+		DeliveryID string `json:"deliveryID"`
+		InputStatus string `json:"inputStatus"`
+		MapsStatus string `json:"mapsStatus"`
+	}
+
+	val := InputReferenceObject{
+		DeliveryID: deliveryID,
+		InputStatus: "order",
+		MapsStatus: "pending",
+	}
+
+	updateResult, err := collectionName.UpdateOne(shashankMongo.CtxForDB, filter, bson.M{"$push":bson.M{"orderRef": val}})
+	if err != nil {
+		log.Error("SaveDeliveryIDToMongo ERROR:")
+		log.Error(err)
+	}
+	return updateResult.ModifiedCount
 }

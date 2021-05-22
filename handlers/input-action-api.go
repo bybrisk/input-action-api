@@ -4,7 +4,7 @@ import (
 	"log"
 )
 
-type Input_Convo struct {
+type Input_Action struct {
  l *log.Logger
 }
 
@@ -18,6 +18,6 @@ type ValidationError struct {
 	Messages []string `json:"messages"`
 }
 
-func New_Input_Convo(l *log.Logger) *Input_Convo{
-	return &Input_Convo{l}
+func New_Input_Action(l *log.Logger) *Input_Action{
+	return &Input_Action{l}
 }
