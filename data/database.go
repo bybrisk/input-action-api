@@ -18,6 +18,7 @@ func IsUserRegistered(docID string) (bool,error) {
 
 	type getData struct {
 		Phonenumber string `json:"phonenumber"`
+		UserName string `json:"username"`
 	}
 
 	var document getData
@@ -28,14 +29,16 @@ func IsUserRegistered(docID string) (bool,error) {
 		log.Error(err)
 	}
 
-	if err!=nil{
+	if err!=nil {
 		isRegistered = false
 	} else {
-		isRegistered = true
+		if document.UserName == "" {
+			isRegistered = false
+		} else {
+			isRegistered = true
+		}
 	}
-
 	return isRegistered,err
-
 }
 
 func GetActionResponseMongo (d *OrderAPIRequest) (string,error) {
@@ -74,12 +77,14 @@ func SaveDeliveryIDToMongo(d *OrderAPIRequest, deliveryID string) int64 {
 		DeliveryID string `json:"deliveryID"`
 		InputStatus string `json:"inputStatus"`
 		MapsStatus string `json:"mapsStatus"`
+		BusinessID string `json:"businessID"`
 	}
 
 	val := InputReferenceObject{
 		DeliveryID: deliveryID,
 		InputStatus: "order",
 		MapsStatus: "pending",
+		BusinessID: d.BusinessID,
 	}
 
 	updateResult, err := collectionName.UpdateOne(shashankMongo.CtxForDB, filter, bson.M{"$push":bson.M{"orderRef": val}})

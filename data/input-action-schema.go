@@ -12,6 +12,10 @@ type OrderAPIResponse struct{
 
 	//Response message
 	Response string `json:"response"`
+
+	//Status code
+	//
+	Status int64 `json:"status"`
 }
 
 //post request for calling the Order API

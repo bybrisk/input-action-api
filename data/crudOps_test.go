@@ -9,15 +9,15 @@ import (
 func TestOrderAPICrudOps(t *testing.T) {
 
 	payload := &data.OrderAPIRequest{
-		ActionHandler:"order",
 		UserID: "6083dafb171b889e90c5c7aa",
 		BusinessID: "6038bd0fc35e3b8e8bd9f81a",
 		Phone:"9340212623",
 		CustomerAddress: "MANIT Bhopal, MP",
-		CustomerName: "Shashank Prakash",
+		CustomerName: "Shashank Prakash sharma",
 		ItemWeight: 1,
 		Latitude: 23.4043444,
 		Longitude: 77.3493045,
+		Note:"second test",
 	}
 
 	res:= data.OrderAPICrudOps(payload) 

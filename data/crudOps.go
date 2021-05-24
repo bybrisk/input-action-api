@@ -6,6 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"bytes"
+	"fmt"
 )
 
 func OrderAPICrudOps(d *OrderAPIRequest) *OrderAPIResponse{
@@ -20,6 +21,7 @@ func OrderAPICrudOps(d *OrderAPIRequest) *OrderAPIResponse{
 		response= OrderAPIResponse{
 			Message:emptyString,
 			Response:"Error! User not registered!",
+			Status:403,
 		}
 	} else{
 
@@ -54,8 +56,12 @@ func OrderAPICrudOps(d *OrderAPIRequest) *OrderAPIResponse{
 			log.Error(err)
 		}
 
+		sb := string(body)
+	    log.Printf(sb)
+		
 		var betaResponseCrossOrigin ResponseFromMaps
 		err = json.Unmarshal(body, &betaResponseCrossOrigin)
+		fmt.Println(betaResponseCrossOrigin)
 
 		if betaResponseCrossOrigin.Message == "Delivery added to ES Queue" {
 			// Save deliveryID against UserID
@@ -67,17 +73,20 @@ func OrderAPICrudOps(d *OrderAPIRequest) *OrderAPIResponse{
 				response= OrderAPIResponse{
 					Message:emptyString,
 					Response:"Error! Database error!",
+					Status:502,
 				}
 			} else {
 				response= OrderAPIResponse{
 					Message:message,
 					Response:"success",
+					Status:200,
 				}
 			}
 		} else {
 			response= OrderAPIResponse{
 				Message:emptyString,
 				Response:"Error! Internal API error!",
+				Status:501,
 			}
 		}
 	}

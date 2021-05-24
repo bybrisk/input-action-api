@@ -36,6 +36,8 @@ func (p *Input_Action) Make_Action_Order (w http.ResponseWriter, r *http.Request
 	response := data.OrderAPICrudOps(request)
 
 	//writing to the io.Writer
+	w.Header().Set("Content-Type", "application/json")
+	
 	err = response.OrderAPIResponseToJSON(w)
 	if err!=nil {
 		http.Error(w,"Data with ID failed to marshel",http.StatusInternalServerError)		
